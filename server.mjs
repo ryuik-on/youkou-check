@@ -53,6 +53,15 @@ async function cloneIfNeeded(submission) {
 
 const server = http.createServer(async (req, res) => {
   try {
+    // 手元の画面からの依頼だけを受け付ける（よそのサイトから、名前を付け替えて送られてくる依頼を断る）
+    if (![`127.0.0.1:${PORT}`, `localhost:${PORT}`].includes(req.headers.host ?? "")) {
+      res.writeHead(403).end();
+      return;
+    }
+    if (req.method === "POST" && !(req.headers["content-type"] ?? "").startsWith("application/json")) {
+      res.writeHead(415).end();
+      return;
+    }
     const url = new URL(req.url, `http://${req.headers.host}`);
 
     if (req.method === "GET" && url.pathname === "/api/example") {
