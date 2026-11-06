@@ -1,7 +1,10 @@
 {
   "name": "youkou-check",
   "version": "1.0.0",
-  "scripts": {},
+  "scripts": {
+    "start": "node --env-file=.env server.mjs",
+    "check": "node --env-file=.env cli.mjs check"
+  },
   "type": "module",
   "dependencies": {
     "@anthropic-ai/sdk": "^1.6.0",

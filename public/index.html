@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>要項チェック</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <h1>要項チェック</h1>
+    <p class="lead">公募の要項と、あなたの提出物を突き合わせます。満たしていない条件と出し漏れを、要項の該当箇所と並べて返します。<strong>出すかどうか、直すかどうかを決めるのはあなたです。</strong></p>
+  </header>
+
+  <main>
+    <form id="form" class="panel">
+      <div class="row-head">
+        <h2>1. 要項</h2>
+        <button type="button" id="example" class="ghost">見本を入れる</button>
+      </div>
+      <label for="rules">要項の文章を貼り付けてください（Web ページや PDF からコピーしたもので構いません）</label>
+      <textarea id="rules" rows="10" required placeholder="例：提出締切は 11月3日 18:00 です。リポジトリは公開にしてください。…"></textarea>
+
+      <h2>2. 提出物</h2>
+      <div class="grid">
+        <div>
+          <label for="github">GitHub リポジトリの URL</label>
+          <input id="github" type="url" placeholder="https://github.com/持ち主/リポジトリ名">
+        </div>
+        <div>
+          <label for="repoPath">または、手元のフォルダ</label>
+          <input id="repoPath" type="text" placeholder="/Users/あなた/Projects/作品">
+        </div>
+        <div>
+          <label for="video">デモ動画の長さ（秒）</label>
+          <input id="video" type="number" min="0" placeholder="150">
+        </div>
+        <div>
+          <label for="email">連絡先（メールアドレス）</label>
+          <input id="email" type="text" placeholder="提出フォームに書く予定のもの">
+        </div>
+      </div>
+      <label for="overview">作品の概要（提出フォームに書く予定の文）</label>
+      <textarea id="overview" rows="4"></textarea>
+
+      <button type="submit" id="go" class="primary">突き合わせる</button>
+      <p class="hint">要項・README・ファイルの中身は Anthropic の API に送られます。秘密の情報（API キーなど）の中身は送りません。</p>
+    </form>
+
+    <section id="status" class="status" hidden></section>
+    <section id="result" hidden></section>
+  </main>
+
+  <script src="app.js" type="module"></script>
+</body>
+</html>
