@@ -1,6 +1,6 @@
 // 手元だけで動くサーバー。127.0.0.1 でしか待ち受けない。
 import http from "node:http";
-import { readFile, mkdtemp, rm, access } from "node:fs/promises";
+import { readFile, writeFile, mkdir, mkdtemp, rm, access } from "node:fs/promises";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import os from "node:os";
@@ -67,6 +67,13 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    if (req.method === "GET" && url.pathname === "/api/last") {
+      const data = await readFile(path.join(ROOT, "results/last.json")).catch(() => null);
+      res.writeHead(data ? 200 : 404, { "Content-Type": "application/json; charset=utf-8" });
+      res.end(data ?? JSON.stringify({ error: "まだ結果がありません。" }));
+      return;
+    }
+
     if (req.method === "POST" && url.pathname === "/api/check") {
       const body = await readBody(req);
       if (!body.rulesText?.trim()) throw new Error("要項の文章を入れてください。");
@@ -82,6 +89,9 @@ const server = http.createServer(async (req, res) => {
         cloned = await cloneIfNeeded(submission);
         const result = await check({ rulesText: body.rulesText, submission }, (m) => send({ progress: m }));
         send({ result });
+        // 直前の結果を手元に残す（results/ は公開リポジトリに入らない）
+        await mkdir(path.join(ROOT, "results"), { recursive: true });
+        await writeFile(path.join(ROOT, "results/last.json"), JSON.stringify(result));
       } catch (e) {
         send({ error: e.message });
       } finally {

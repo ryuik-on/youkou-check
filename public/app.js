@@ -5,6 +5,18 @@ let filter = null;
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
+async function loadLast() {
+  const r = await fetch("/api/last");
+  if (!r.ok) return false;
+  current = await r.json();
+  filter = null;
+  render();
+  return true;
+}
+fetch("/api/last").then((r) => { $("last").hidden = !r.ok; });
+$("last").addEventListener("click", () => loadLast().then(() => $("result").scrollIntoView({ behavior: "smooth" })));
+if (new URLSearchParams(location.search).has("last")) loadLast();
+
 $("example").addEventListener("click", async () => {
   const r = await fetch("/api/example").then((r) => r.json());
   $("rules").value = r.rulesText;
@@ -57,6 +69,7 @@ $("form").addEventListener("submit", async (ev) => {
         if (msg.result) {
           current = msg.result;
           current.elapsed = Math.round((Date.now() - started) / 1000);
+          $("last").hidden = false;
           filter = null;
           render();
           status.hidden = true;
@@ -98,7 +111,7 @@ function render() {
   $("result").innerHTML = `
     <h2>${esc(r.title)}：${r.items.length} 件の条件</h2>
     <div class="summary">${ORDER.map((s) => `<button class="count ${filter === s ? "active" : ""}" data-filter="${s}"><b>${counts[s]}</b>${s}</button>`).join("")}</div>
-    <p class="meta">${r.cost.model} ／ ${current.elapsed} 秒 ／ API の料金の目安 $${r.cost.usd.toFixed(2)}${r.submissionDeadline ? ` ／ 締切 ${new Date(r.submissionDeadline).toLocaleString("ja-JP")}` : ""}</p>
+    <p class="meta">${r.cost.model} ／ ${current.elapsed ? `${current.elapsed} 秒 ／ ` : ""} API の料金の目安 $${r.cost.usd.toFixed(2)}${r.submissionDeadline ? ` ／ 締切 ${new Date(r.submissionDeadline).toLocaleString("ja-JP")}` : ""}</p>
     <div class="reminder">これは見直しのための材料です。Claude の判定は間違えることがあります。それぞれの条件を自分の目で確かめたら、「確かめた」に印を付けてください。</div>
     ${items.map((it, n) => `
       <article class="item" data-status="${it.verdict.status}" id="item-${it.id}">

@@ -16,7 +16,10 @@
     <form id="form" class="panel">
       <div class="row-head">
         <h2>1. 要項</h2>
-        <button type="button" id="example" class="ghost">見本を入れる</button>
+        <span>
+          <button type="button" id="last" class="ghost" hidden>前回の結果を見る</button>
+          <button type="button" id="example" class="ghost">見本を入れる</button>
+        </span>
       </div>
       <label for="rules">要項の文章を貼り付けてください（Web ページや PDF からコピーしたもので構いません）</label>
       <textarea id="rules" rows="10" required placeholder="例：提出締切は 11月3日 18:00 です。リポジトリは公開にしてください。…"></textarea>
