@@ -1,0 +1,17 @@
+# 鍵（API キーなど）
+.env
+.env.*
+!.env.example
+
+# 手元で試した本物の要項と結果（公開しない）
+private/
+results/
+
+# 依存と生成物
+node_modules/
+dist/
+
+# OS とエディタ
+.DS_Store
+.vscode/
+.idea/
