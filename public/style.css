@@ -119,5 +119,5 @@ details { margin-top: 20px; }
 summary { cursor: pointer; color: var(--muted); }
 
 /* デモ動画用の字幕（?demo のときだけ） */
-.demo-caption { position: fixed; left: 0; right: 0; bottom: 28px; margin: 0 auto; width: fit-content; max-width: min(1240px, calc(100vw - 32px)); background: rgba(0, 0, 0, 0.82); color: #fff; font-size: 24px; font-weight: 600; word-break: keep-all; overflow-wrap: anywhere; line-height: 1.5; padding: 14px 28px; border-radius: 12px; text-align: center; z-index: 10; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3); }
+.demo-caption { position: fixed; left: 0; right: 0; bottom: 28px; margin: 0 auto; width: fit-content; max-width: min(1240px, calc(100vw - 32px)); background: rgba(0, 0, 0, 0.82); color: #fff; font-size: 24px; font-weight: 600; word-break: keep-all; overflow-wrap: anywhere; line-height: 1.5; padding: 14px 28px; border-radius: 12px; text-align: center; z-index: 10; pointer-events: none; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3); }
 .demo-caption.off { display: none; }
