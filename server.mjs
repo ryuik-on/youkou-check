@@ -7,6 +7,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { check } from "./lib/check.mjs";
+import { documentFromFile } from "./lib/pdf.mjs";
 
 const run = promisify(execFile);
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
@@ -23,7 +24,7 @@ async function readBody(req) {
   let size = 0;
   for await (const c of req) {
     size += c.length;
-    if (size > 5 * 1024 * 1024) throw new Error("送られてきた内容が大きすぎます（5MB まで）。");
+    if (size > 40 * 1024 * 1024) throw new Error("送られてきた内容が大きすぎます（全部で 30MB ほどまで）。");
     chunks.push(c);
   }
   return JSON.parse(Buffer.concat(chunks).toString("utf8"));
@@ -64,6 +65,26 @@ const server = http.createServer(async (req, res) => {
     }
     const url = new URL(req.url, `http://${req.headers.host}`);
 
+    if (req.method === "GET" && url.pathname === "/api/example" && url.searchParams.get("name") === "hojokin") {
+      const dir = path.join(ROOT, "examples/hojokin/pdf");
+      const load = async (f) => documentFromFile(f, await readFile(path.join(dir, f)));
+      const names = ["shinsei.pdf", "keikaku.pdf", "keihi.pdf", "mitsumori.pdf", "kakutei.pdf"];
+      res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+      res.end(JSON.stringify({ rulesText: (await load("youryou.pdf")).text, documents: await Promise.all(names.map(load)) }));
+      return;
+    }
+
+    // 選んだファイル（PDF・テキスト）を文字にして返す。画面で中身を確かめられるように、ここで一度返す
+    if (req.method === "POST" && url.pathname === "/api/document") {
+      const body = await readBody(req);
+      if (typeof body.name !== "string" || typeof body.data !== "string") throw new Error("ファイルが読めませんでした。");
+      if (!/\.(pdf|txt|md|csv)$/i.test(body.name)) throw new Error("読めるのは PDF・テキスト（.txt .md .csv）のファイルです。");
+      const doc = await documentFromFile(path.basename(body.name), Buffer.from(body.data, "base64"));
+      res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+      res.end(JSON.stringify(doc));
+      return;
+    }
+
     if (req.method === "GET" && url.pathname === "/api/example") {
       const rulesText = await readFile(path.join(ROOT, "examples/yanbaru-hackathon-2026.md"), "utf8");
       res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
@@ -87,6 +108,9 @@ const server = http.createServer(async (req, res) => {
       const body = await readBody(req);
       if (!body.rulesText?.trim()) throw new Error("要項の文章を入れてください。");
       const submission = body.submission ?? {};
+      submission.documents = (Array.isArray(submission.documents) ? submission.documents : [])
+        .filter((d) => typeof d?.name === "string" && typeof d?.text === "string")
+        .map((d) => ({ name: d.name, pages: Number.isInteger(d.pages) ? d.pages : null, text: d.text }));
       if (submission.repoPath) await access(submission.repoPath).catch(() => { throw new Error(`フォルダが見つかりません：${submission.repoPath}`); });
 
       // 途中経過を1行ずつ送り、最後に結果を送る

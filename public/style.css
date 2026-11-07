@@ -110,3 +110,10 @@ blockquote { margin: 0; padding: 8px 12px; border-left: 3px solid var(--line); b
 .ambiguities li { margin-bottom: 6px; }
 .actions { display: flex; gap: 12px; margin: 24px 0 64px; flex-wrap: wrap; }
 code { font-size: 13px; }
+
+.docs { list-style: none; padding: 0; margin: 0 0 8px; }
+.docs li { display: flex; gap: 12px; align-items: baseline; padding: 6px 12px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 6px; font-size: 14px; }
+.docs li span { color: var(--muted); font-size: 12px; }
+.docs li button { margin-left: auto; padding: 0 8px; border: none; background: none; color: var(--muted); }
+details { margin-top: 20px; }
+summary { cursor: pointer; color: var(--muted); }

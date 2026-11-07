@@ -1,0 +1,12 @@
+@page { size: A4; margin: 20mm 18mm; }
+body { font-family: "Hiragino Mincho ProN", serif; font-size: 10.5pt; line-height: 1.75; color: #000; }
+h1 { font-size: 16pt; text-align: center; margin: 0 0 4mm; }
+h2 { font-size: 12pt; margin: 6mm 0 2mm; border-bottom: 1px solid #000; }
+h3 { font-size: 11pt; margin: 4mm 0 1mm; }
+p.c { text-align: center; } p.r { text-align: right; }
+table { border-collapse: collapse; width: 100%; margin: 2mm 0; }
+th, td { border: 1px solid #000; padding: 1.5mm 2.5mm; vertical-align: top; text-align: left; }
+th { background: #eee; font-weight: normal; }
+td.n { text-align: right; white-space: nowrap; }
+.note { font-size: 9pt; }
+.box { border: 1px solid #000; padding: 3mm; }

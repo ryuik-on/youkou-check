@@ -2,6 +2,47 @@ const $ = (id) => document.getElementById(id);
 const ORDER = ["満たしていない", "判定できません", "本人が確かめる", "満たしている"];
 let current = null;
 let filter = null;
+let documents = [];
+
+const toBase64 = (buf) => {
+  let s = "";
+  const bytes = new Uint8Array(buf);
+  for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  return btoa(s);
+};
+async function readDocument(file) {
+  const r = await fetch("/api/document", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: file.name, data: toBase64(await file.arrayBuffer()) }) });
+  const j = await r.json();
+  if (!r.ok) throw new Error(j.error);
+  return j;
+}
+function renderDocs() {
+  $("docs").innerHTML = documents.map((d, i) => `<li>${esc(d.name)} <span>${d.pages ? `${d.pages} ページ・` : ""}${[...d.text.replace(/\s/g, "")].length.toLocaleString()} 字</span><button type="button" data-remove="${i}" aria-label="外す">×</button></li>`).join("");
+  document.querySelectorAll("[data-remove]").forEach((b) => b.addEventListener("click", () => { documents.splice(Number(b.dataset.remove), 1); renderDocs(); }));
+}
+$("rules-pdf").addEventListener("click", () => $("rules-file").click());
+$("rules-file").addEventListener("change", async (ev) => {
+  const f = ev.target.files[0];
+  if (!f) return;
+  try { $("rules").value = (await readDocument(f)).text; } catch (e) { alert(e.message); }
+  ev.target.value = "";
+});
+$("docs-add").addEventListener("click", () => $("docs-file").click());
+$("docs-file").addEventListener("change", async (ev) => {
+  for (const f of ev.target.files) {
+    try { documents.push(await readDocument(f)); } catch (e) { alert(`${f.name}：${e.message}`); }
+  }
+  ev.target.value = "";
+  renderDocs();
+});
+$("example-hojokin").addEventListener("click", async () => {
+  const r = await fetch("/api/example?name=hojokin").then((r) => r.json());
+  $("rules").value = r.rulesText;
+  documents = r.documents;
+  renderDocs();
+  for (const id of ["github", "repoPath", "overview", "email", "video"]) $(id).value = "";
+  $("more").open = false;
+});
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
@@ -25,6 +66,9 @@ $("example").addEventListener("click", async () => {
   $("overview").value = r.form.overview;
   $("email").value = r.form.email;
   $("video").value = r.videoSecondsInput;
+  documents = [];
+  renderDocs();
+  $("more").open = true;
 });
 
 $("form").addEventListener("submit", async (ev) => {
@@ -46,6 +90,7 @@ $("form").addEventListener("submit", async (ev) => {
     submission: {
       githubUrl: $("github").value.trim() || undefined,
       repoPath: $("repoPath").value.trim() || undefined,
+      documents,
       videoSecondsInput: $("video").value ? Number($("video").value) : undefined,
       form: { 作品の概要: $("overview").value, 連絡先: $("email").value },
     },
@@ -94,7 +139,7 @@ function quoteBlock(text, verified, label) {
 function evidenceList(evs) {
   if (!evs.length) return `<p class="src">根拠になるものは見つかりませんでした。</p>`;
   return `<ul class="evidence">${evs.map((e) => {
-    const where = e.source === "ファイル" ? `ファイル ${esc(e.file)}` : e.source === "事実" ? "プログラムで調べた事実" : esc(e.source);
+    const where = e.source === "ファイル" ? `ファイル ${esc(e.file)}` : e.source === "提出書類" ? `書類 ${esc(e.file)}` : e.source === "事実" ? "プログラムで調べた事実" : esc(e.source);
     const mark = e.verified === true ? `<span class="verify ok">✓ 照合済み</span>` : e.verified === false ? `<span class="verify bad">⚠ 原文に見つかりません</span>` : "";
     return `<li><span class="src">${where}</span> ${mark}<br>${e.source === "事実" ? `<code>${esc(e.text)}</code>` : `「${esc(e.text)}」`}</li>`;
   }).join("")}</ul>`;

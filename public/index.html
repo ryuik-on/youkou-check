@@ -9,7 +9,7 @@
 <body>
   <header class="top">
     <h1>要項チェック</h1>
-    <p class="lead">公募の要項と、あなたの提出物を突き合わせます。満たしていない条件と出し漏れを、要項の該当箇所と並べて返します。<strong>出すかどうか、直すかどうかを決めるのはあなたです。</strong></p>
+    <p class="lead">補助金・奨学金・ハッカソンなどの公募の要項と、あなたの提出書類を突き合わせます。満たしていない条件と出し漏れを、要項の該当箇所と並べて返します。<strong>出すかどうか、直すかどうかを決めるのはあなたです。</strong></p>
   </header>
 
   <main>
@@ -18,13 +18,21 @@
         <h2>1. 要項</h2>
         <span>
           <button type="button" id="last" class="ghost" hidden>前回の結果を見る</button>
-          <button type="button" id="example" class="ghost">見本を入れる</button>
+          <button type="button" id="example-hojokin" class="ghost">見本：補助金</button>
+          <button type="button" id="example" class="ghost">見本：ハッカソン</button>
         </span>
       </div>
-      <label for="rules">要項の文章を貼り付けてください（Web ページや PDF からコピーしたもので構いません）</label>
+      <label for="rules">要項の文章を貼り付けるか、PDF を読み込んでください</label>
+      <p><button type="button" id="rules-pdf" class="ghost">PDF から読み込む</button> <input type="file" id="rules-file" accept=".pdf,.txt,.md" hidden></p>
       <textarea id="rules" rows="10" required placeholder="例：提出締切は 11月3日 18:00 です。リポジトリは公開にしてください。…"></textarea>
 
       <h2>2. 提出物</h2>
+      <label>提出書類（PDF・テキスト。いくつでも）</label>
+      <p><button type="button" id="docs-add" class="ghost">書類を追加</button> <input type="file" id="docs-file" accept=".pdf,.txt,.md,.csv" multiple hidden></p>
+      <ul id="docs" class="docs"></ul>
+
+      <details id="more">
+      <summary>作品のリポジトリ・動画・フォーム（ハッカソンなど）</summary>
       <div class="grid">
         <div>
           <label for="github">GitHub リポジトリの URL</label>
@@ -45,9 +53,10 @@
       </div>
       <label for="overview">作品の概要（提出フォームに書く予定の文）</label>
       <textarea id="overview" rows="4"></textarea>
+      </details>
 
       <button type="submit" id="go" class="primary">突き合わせる</button>
-      <p class="hint">要項・README・ファイルの中身は Anthropic の API に送られます。秘密の情報（API キーなど）の中身は送りません。</p>
+      <p class="hint">要項・提出書類・README・ファイルの中身は Anthropic の API に送られます。秘密の情報（API キーなど）の中身は送りません。</p>
     </form>
 
     <section id="status" class="status" hidden></section>
