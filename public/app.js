@@ -35,6 +35,14 @@ $("docs-file").addEventListener("change", async (ev) => {
   ev.target.value = "";
   renderDocs();
 });
+$("clear").addEventListener("click", () => {
+  for (const id of ["rules", "github", "repoPath", "overview", "email", "video"]) $(id).value = "";
+  documents = [];
+  renderDocs();
+  $("result").hidden = true;
+  $("status").hidden = true;
+  window.scrollTo({ top: 0 });
+});
 $("example-hojokin").addEventListener("click", async () => {
   const r = await fetch("/api/example?name=hojokin").then((r) => r.json());
   $("rules").value = r.rulesText;
@@ -57,6 +65,7 @@ async function loadLast() {
 fetch("/api/last").then((r) => { $("last").hidden = !r.ok; });
 $("last").addEventListener("click", () => loadLast().then(() => $("result").scrollIntoView({ behavior: "smooth" })));
 if (new URLSearchParams(location.search).has("last")) loadLast();
+if (new URLSearchParams(location.search).has("demo")) import("./demo.js");
 
 $("example").addEventListener("click", async () => {
   const r = await fetch("/api/example").then((r) => r.json());
