@@ -7,7 +7,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { check } from "./lib/check.mjs";
-import { documentFromFile } from "./lib/pdf.mjs";
+import { documentFromFile, DOCUMENT_TYPES } from "./lib/pdf.mjs";
 
 const run = promisify(execFile);
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
@@ -78,7 +78,7 @@ const server = http.createServer(async (req, res) => {
     if (req.method === "POST" && url.pathname === "/api/document") {
       const body = await readBody(req);
       if (typeof body.name !== "string" || typeof body.data !== "string") throw new Error("ファイルが読めませんでした。");
-      if (!/\.(pdf|txt|md|csv)$/i.test(body.name)) throw new Error("読めるのは PDF・テキスト（.txt .md .csv）のファイルです。");
+      if (!DOCUMENT_TYPES.test(body.name)) throw new Error("読めるのは PDF・Word（.docx）・Excel（.xlsx）・テキスト（.txt .md .csv）のファイルです。");
       const doc = await documentFromFile(path.basename(body.name), Buffer.from(body.data, "base64"));
       res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
       res.end(JSON.stringify(doc));
@@ -111,6 +111,7 @@ const server = http.createServer(async (req, res) => {
       submission.documents = (Array.isArray(submission.documents) ? submission.documents : [])
         .filter((d) => typeof d?.name === "string" && typeof d?.text === "string")
         .map((d) => ({ name: d.name, pages: Number.isInteger(d.pages) ? d.pages : null, text: d.text }));
+      if (submission.videoUrl != null && typeof submission.videoUrl !== "string") throw new Error("動画の URL が読めませんでした。");
       if (submission.repoPath) await access(submission.repoPath).catch(() => { throw new Error(`フォルダが見つかりません：${submission.repoPath}`); });
 
       // 途中経過を1行ずつ送り、最後に結果を送る

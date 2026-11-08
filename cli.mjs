@@ -1,7 +1,7 @@
 // 手元で試すためのコマンド
 //   node --env-file=.env cli.mjs extract <要項>
 //   node --env-file=.env cli.mjs check <要項> [提出物 …]
-// 要項は PDF・テキストのどちらでもよい。提出物には、フォルダ（Git のリポジトリ）、GitHub の URL、書類（PDF・テキスト）を並べられる
+// 要項は PDF・テキストのどちらでもよい。提出物には、フォルダ（Git のリポジトリ）、GitHub の URL、YouTube の URL、書類（PDF・Word・Excel・テキスト）を並べられる
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { extractRequirements } from "./lib/extract.mjs";
@@ -26,6 +26,7 @@ if (cmd === "extract" && file) {
   const submission = { documents: [] };
   for (const a of rest) {
     if (/^https:\/\/github\.com\//.test(a)) submission.githubUrl = a;
+    else if (/^https:\/\/(www\.|m\.)?(youtube\.com|youtu\.be)\//.test(a)) submission.videoUrl = a;
     else if ((await stat(a)).isDirectory()) submission.repoPath = a;
     else submission.documents.push(await documentFromFile(path.basename(a), await readFile(a)));
   }
@@ -40,6 +41,6 @@ if (cmd === "extract" && file) {
   }
   if (r.ambiguities.length) console.log(`\n## あいまいな点\n${r.ambiguities.map((a) => `- ${a}`).join("\n")}`);
 } else {
-  console.error("使い方：node --env-file=.env cli.mjs extract <要項>\n　　　　node --env-file=.env cli.mjs check <要項> [フォルダ・GitHub の URL・書類 …]");
+  console.error("使い方：node --env-file=.env cli.mjs extract <要項>\n　　　　node --env-file=.env cli.mjs check <要項> [フォルダ・GitHub の URL・YouTube の URL・書類 …]");
   process.exit(1);
 }

@@ -28,8 +28,8 @@
       <textarea id="rules" rows="10" required placeholder="例：提出締切は 11月3日 18:00 です。リポジトリは公開にしてください。…"></textarea>
 
       <h2>2. 提出物</h2>
-      <label>提出書類（PDF・テキスト。いくつでも）</label>
-      <p><button type="button" id="docs-add" class="ghost">書類を追加</button> <input type="file" id="docs-file" accept=".pdf,.txt,.md,.csv" multiple hidden></p>
+      <label>提出書類（PDF・Word・Excel・テキスト。いくつでも）</label>
+      <p><button type="button" id="docs-add" class="ghost">書類を追加</button> <input type="file" id="docs-file" accept=".pdf,.docx,.xlsx,.txt,.md,.csv" multiple hidden></p>
       <ul id="docs" class="docs"></ul>
 
       <details id="more">
@@ -44,7 +44,11 @@
           <input id="repoPath" type="text" placeholder="/Users/あなた/Projects/作品">
         </div>
         <div>
-          <label for="video">デモ動画の長さ（秒）</label>
+          <label for="videoUrl">デモ動画の URL（YouTube）</label>
+          <input id="videoUrl" type="url" placeholder="https://youtu.be/…">
+        </div>
+        <div>
+          <label for="video">または、動画の長さ（秒）</label>
           <input id="video" type="number" min="0" placeholder="150">
         </div>
         <div>

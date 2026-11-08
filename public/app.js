@@ -36,7 +36,7 @@ $("docs-file").addEventListener("change", async (ev) => {
   renderDocs();
 });
 $("clear").addEventListener("click", () => {
-  for (const id of ["rules", "github", "repoPath", "overview", "email", "video"]) $(id).value = "";
+  for (const id of ["rules", "github", "repoPath", "overview", "email", "video", "videoUrl"]) $(id).value = "";
   documents = [];
   renderDocs();
   $("result").hidden = true;
@@ -48,7 +48,7 @@ $("example-hojokin").addEventListener("click", async () => {
   $("rules").value = r.rulesText;
   documents = r.documents;
   renderDocs();
-  for (const id of ["github", "repoPath", "overview", "email", "video"]) $(id).value = "";
+  for (const id of ["github", "repoPath", "overview", "email", "video", "videoUrl"]) $(id).value = "";
   $("more").open = false;
 });
 
@@ -75,6 +75,7 @@ $("example").addEventListener("click", async () => {
   $("overview").value = r.form.overview;
   $("email").value = r.form.email;
   $("video").value = r.videoSecondsInput;
+  $("videoUrl").value = "";
   documents = [];
   renderDocs();
   $("more").open = true;
@@ -100,6 +101,7 @@ $("form").addEventListener("submit", async (ev) => {
       githubUrl: $("github").value.trim() || undefined,
       repoPath: $("repoPath").value.trim() || undefined,
       documents,
+      videoUrl: $("videoUrl").value.trim() || undefined,
       videoSecondsInput: $("video").value ? Number($("video").value) : undefined,
       form: { 作品の概要: $("overview").value, 連絡先: $("email").value },
     },
